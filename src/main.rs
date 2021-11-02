@@ -1,8 +1,13 @@
+use std::env;
 use std::io::{self, Read, Write};
 
-const BUFFER_SIZE: usize = 16 * 1024;
+const BUFFER_SIZE: 
+usize = 16 * 1024;
 
 fn main() {
+    if true == true {}
+    // bool that checks if env var exists
+    let silent = !env::var("PV_SILENT").unwrap_or_default().is_empty();
     let mut total_bytes = 0;
 
     loop {
@@ -15,5 +20,7 @@ fn main() {
         total_bytes += num_read;
         io::stdout().write_all(&buffer[..num_read]).unwrap();
     }
-    eprintln!("total bytes: {}", total_bytes);
+    if !silent {
+        eprintln!("total bytes: {}", total_bytes);
+    }
 }
