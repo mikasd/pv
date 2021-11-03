@@ -6,7 +6,6 @@ use std::io::{self, BufReader, BufWriter, ErrorKind, Read, Result, Write};
 const BUFFER_SIZE: usize = 16 * 1024;
 
 fn main() -> Result<()> {
-
     let matches = App::new("pipeviewer")
         .arg(Arg::with_name("infile").help("Read from a file instead of stdin"))
         .arg(
@@ -14,11 +13,9 @@ fn main() -> Result<()> {
                 .short("o")
                 .long("outfile")
                 .takes_value(true)
-                .help("Write output to a file instead of stdout")
-            )
-        .arg(Arg::with_name("silent")
-                .short("s")
-                .long("silent"))
+                .help("Write output to a file instead of stdout"),
+        )
+        .arg(Arg::with_name("silent").short("s").long("silent"))
         .get_matches();
 
     let infile = matches.value_of("infile").unwrap_or_default();
@@ -40,7 +37,6 @@ fn main() -> Result<()> {
     } else {
         Box::new(BufWriter::new(io::stdout()))
     };
-
 
     let mut total_bytes = 0;
     let mut buffer = [0; BUFFER_SIZE];
