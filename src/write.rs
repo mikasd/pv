@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::{self, BufWriter, ErrorKind, Result, Write};
-use std::sync::mpsc::{Receiver};
+use std::sync::mpsc::Receiver;
 
 pub fn write_loop(outfile: &str, write_rx: Receiver<Vec<u8>>) -> Result<()> {
     let mut writer: Box<dyn Write> = if !outfile.is_empty() {
@@ -11,7 +11,7 @@ pub fn write_loop(outfile: &str, write_rx: Receiver<Vec<u8>>) -> Result<()> {
 
     loop {
         let buffer: Vec<u8> = write_rx.recv().unwrap();
-        
+
         if buffer.is_empty() {
             break;
         }

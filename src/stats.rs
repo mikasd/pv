@@ -22,7 +22,7 @@ pub fn stats_loop(
         }
     }
     if !silent {
-        eprintln!("{}", total_bytes);
+        eprintln!();
     }
     Ok(())
 }
