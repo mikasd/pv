@@ -1,16 +1,11 @@
 use crate::BUFFER_SIZE;
 
-use std::fs::File;
-
 use crossbeam::channel::Sender;
-use std::io::{self, BufReader, Read, Result};
+use std::io::{BufReader, Read, Result};
+use encoding::{DecoderTrap, Encoding, all::WINDOWS_1252};
 
-pub fn read_loop(infile: &str, stats_tx: Sender<usize>, write_tx: Sender<Vec<u8>>) -> Result<()> {
-    let mut reader: Box<dyn Read> = if !infile.is_empty() {
-        Box::new(BufReader::new(File::open(infile)?))
-    } else {
-        Box::new(BufReader::new(io::stdin()))
-    };
+pub fn read_loop<R: Read>(reader: R, stats_tx: Sender<usize>, write_tx: Sender<Vec<u8>>) -> Result<()> {
+    let mut reader = BufReader::new(reader);
 
     let mut buffer = [0; BUFFER_SIZE];
     loop {
@@ -19,11 +14,20 @@ pub fn read_loop(infile: &str, stats_tx: Sender<usize>, write_tx: Sender<Vec<u8>
             Ok(x) => x,
             Err(_) => break,
         };
-        let _ = stats_tx.send(num_read);
-        if write_tx.send(Vec::from(&buffer[..num_read])).is_err() {
+
+        let decoded_bytes = WINDOWS_1252.decode(&buffer, DecoderTrap::Replace);
+
+        if let Ok(bytes) = decoded_bytes {
+            let _ = stats_tx.send(num_read);
+            if write_tx.send(bytes.into_bytes()).is_err() {
+                break;
+            }
+        } else {
+            eprintln!("error during decoding, {:?}", decoded_bytes);
             break;
         }
     }
+    
     let _ = stats_tx.send(0);
     let _ = write_tx.send(Vec::new());
     Ok(())

@@ -18,7 +18,7 @@ pub fn stats_loop(silent: bool, stats_rx: Receiver<usize>) -> Result<()> {
             eprint!(
                 "\r{} {} [{:.0}b/s]",
                 total_bytes,
-                start.elapsed().as_secs().as_time(),
+                start.elapsed().as_millis(),
                 rate_per_second
             );
         }
